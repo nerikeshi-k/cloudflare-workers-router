@@ -1,3 +1,4 @@
+import { handleRequest } from './handler';
 import { createPathTestFragments, resolveDynamicPath } from './parser';
 import {
   DynamicRoute,
@@ -7,6 +8,8 @@ import {
   METHOD_ANY,
   StaticRoute,
 } from './types';
+
+type InitOptions = Partial<{ fallback: Handler }>;
 
 const DYNAMIC_ROUTE_TREE_KEY_END = '\0';
 const DYNAMIC_ROUTE_TREE_KEY_WILDCARD = ':';
@@ -30,10 +33,10 @@ export class Router {
   private dynamicRouteTree: DynamicRouteTree = new Map(
     METHODS.map((method) => [method, new Map()])
   );
-  private fallbackHandler: Handler | null;
+  private fallbackHandler: Handler;
 
-  constructor(options: { fallback?: Handler } = {}) {
-    this.fallbackHandler = options.fallback ?? null;
+  constructor(options: InitOptions = {}) {
+    this.fallbackHandler = options.fallback ?? handleRequest;
   }
 
   private createStaticRouteMapKey(method: string, path: string): string {
@@ -161,13 +164,7 @@ export class Router {
     }
 
     // no matches
-    if (this.fallbackHandler != null) {
-      return this.fallbackHandler(request);
-    }
-    return new Response('no content', {
-      status: 404,
-      statusText: 'content not found',
-    });
+    return this.fallbackHandler(request);
   }
 
   get(path: string, handler: Handler) {

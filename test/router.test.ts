@@ -122,7 +122,13 @@ describe('Router', () => {
   });
 
   test('route resolving works correctly', async () => {
-    const router = new Router();
+    const fallback = () =>
+      new Response('no content', {
+        status: 404,
+        statusText: 'content not found',
+      });
+
+    const router = new Router({ fallback });
     const responses = {
       getTop: new Response(),
       getArticle: new Response(),
