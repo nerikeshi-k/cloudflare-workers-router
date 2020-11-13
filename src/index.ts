@@ -4,6 +4,7 @@ import {
   Handler,
   Method,
   METHODS,
+  METHOD_ANY,
   StaticHandler,
   StaticRoute,
 } from './types';
@@ -50,6 +51,8 @@ export class Router {
       ...path.split('/'),
       DYNAMIC_ROUTE_TREE_KEY_END,
     ];
+    const fallbackAny = () =>
+      method !== METHOD_ANY ? this.findDynamicRoute(METHOD_ANY, path) : null;
     let cursor = this.dynamicRouteTree;
     for (let fragment of fragments) {
       const next =
@@ -62,14 +65,14 @@ export class Router {
           assertIsDynamicRouteTreeEnd(ignoreAfterRoute);
           return ignoreAfterRoute;
         }
-        return null;
+        return fallbackAny();
       }
       if (isDynamicRouteTreeEnd(next)) {
         return next;
       }
       cursor = next;
     }
-    return null;
+    return fallbackAny();
   }
 
   private appendRoute(method: Method, path: string, handler: Handler) {
@@ -137,9 +140,11 @@ export class Router {
     const { pathname } = new URL(request.url);
     // try to resolve as static path
     {
-      const route = this.staticRoutes.get(
-        this.createStaticRouteMapKey(method, pathname)
-      );
+      const route =
+        this.staticRoutes.get(this.createStaticRouteMapKey(method, pathname)) ??
+        this.staticRoutes.get(
+          this.createStaticRouteMapKey(METHOD_ANY, pathname)
+        );
       if (route != null) {
         return route.handler(request);
       }
@@ -191,6 +196,10 @@ export class Router {
 
   trace(path: string, handler: Handler) {
     return this.appendRoute('trace', path, handler);
+  }
+
+  any(path: string, handler: Handler) {
+    return this.appendRoute(METHOD_ANY, path, handler);
   }
 
   async handle(request: Request): Promise<Response> {

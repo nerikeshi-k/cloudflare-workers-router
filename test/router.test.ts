@@ -1,4 +1,5 @@
 import { Router } from '../src';
+import { METHODS } from '../src/types';
 import makeWorkerMock = require('service-worker-mock');
 
 describe('Router', () => {
@@ -87,6 +88,37 @@ describe('Router', () => {
         }).not.toThrow();
       });
     });
+
+    test('can append duplicated paths if their method is different', () => {
+      const router = new Router();
+      expect(() => {
+        router.get('/', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.post('/', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.any('/', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.get('/:id', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.post('/:id', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.any('/:id', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.get('/*', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.post('/*', () => new Response());
+      }).not.toThrow();
+      expect(() => {
+        router.any('/*', () => new Response());
+      }).not.toThrow();
+    });
   });
 
   test('route resolving works correctly', async () => {
@@ -103,6 +135,8 @@ describe('Router', () => {
       getStaticAssets: new Response(),
       postArticle: new Response(),
       patchArticle: new Response(),
+      anyMethod: new Response(),
+      anyMethodDynamic: new Response(),
     };
     router.get('/', async () => responses.getTop);
     router.get('/articles/:id', async () => responses.getArticle);
@@ -121,6 +155,8 @@ describe('Router', () => {
     );
     router.get('/assets/*', async () => responses.getAssets);
     router.get('/assets/x.png', async () => responses.getStaticAssets);
+    router.any('/any', async () => responses.anyMethod);
+    router.any('/any/:dynamic', async () => responses.anyMethodDynamic);
 
     let res = await router.handle(new Request('/'));
     expect(res).toEqual(responses.getTop);
@@ -155,6 +191,18 @@ describe('Router', () => {
     expect(res).toEqual(responses.getAssets);
     res = await router.handle(new Request('/assets/x.png'));
     expect(res).toEqual(responses.getStaticAssets);
+
+    for (let method of METHODS) {
+      if (method === 'any') continue;
+      const res = await router.handle(new Request('/any', { method }));
+      expect(res).toEqual(responses.anyMethod);
+    }
+
+    for (let method of METHODS) {
+      if (method === 'any') continue;
+      const res = await router.handle(new Request('/any/dynamic', { method }));
+      expect(res).toEqual(responses.anyMethod);
+    }
   });
 
   describe('dynamic routes parameters', () => {

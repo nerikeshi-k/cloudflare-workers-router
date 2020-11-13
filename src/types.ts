@@ -1,4 +1,6 @@
+export const METHOD_ANY = 'any';
 export const METHODS = [
+  METHOD_ANY,
   'get',
   'post',
   'patch',

@@ -1,15 +1,19 @@
-# cloudflare-workers-tiny-router
+# cloudflare-workers-router
 
 0 dependencies tiny router for cloudflare workers
 
 # install
 
-```sh
-$ npm i @neriko/cloudflare-workers-tiny-router
-```
+if you use npm,
 
 ```sh
-$ yarn add @neriko/cloudflare-workers-tiny-router
+$ npm i @neriko/cloudflare-workers-router
+```
+
+if you use yarn,
+
+```sh
+$ yarn add @neriko/cloudflare-workers-router
 ```
 
 # usage
