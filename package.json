@@ -1,6 +1,6 @@
 {
   "name": "@neriko/cloudflare-workers-router",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "0 dependencies tiny router for cloudflare workers",
   "main": "dist/index.js",
   "scripts": {
