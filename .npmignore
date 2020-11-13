@@ -1,3 +1,4 @@
+src/
 test/
 .prettierrc.json
 jest.config.js
