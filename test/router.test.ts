@@ -210,7 +210,7 @@ describe('Router', () => {
       const router = new Router();
       const value = 'abc123';
       router.get('/articles/:id', (req, params) => {
-        expect(params.id).toEqual(value);
+        expect(params?.id).toEqual(value);
         return new Response();
       });
       await router.handle(new Request(`/articles/${value}`));

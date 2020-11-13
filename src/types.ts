@@ -12,12 +12,10 @@ export const METHODS = [
 export type Method = typeof METHODS[number];
 
 export type Params = { [key: string]: string };
-export type StaticHandler = (req: Request) => Promise<Response>;
-export type DynamicHandler = <T extends Params = {}>(
+export type Handler = <T extends Params = {}>(
   req: Request,
-  params: T
+  params?: T
 ) => Response | Promise<Response>;
-export type Handler = StaticHandler | DynamicHandler;
 
 type StaticTestFragment = {
   type: 'static';
@@ -38,11 +36,11 @@ export type PathTestFragment =
 export type StaticRoute = {
   method: Method;
   path: string;
-  handler: StaticHandler;
+  handler: Handler;
 };
 export type DynamicRoute = {
   method: Method;
   rawPath: string;
   tests: PathTestFragment[];
-  handler: DynamicHandler;
+  handler: Handler;
 };

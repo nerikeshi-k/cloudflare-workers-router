@@ -5,7 +5,6 @@ import {
   Method,
   METHODS,
   METHOD_ANY,
-  StaticHandler,
   StaticRoute,
 } from './types';
 
@@ -31,9 +30,9 @@ export class Router {
   private dynamicRouteTree: DynamicRouteTree = new Map(
     METHODS.map((method) => [method, new Map()])
   );
-  private fallbackHandler: StaticHandler | null;
+  private fallbackHandler: Handler | null;
 
-  constructor(options: { fallback?: StaticHandler } = {}) {
+  constructor(options: { fallback?: Handler } = {}) {
     this.fallbackHandler = options.fallback ?? null;
   }
 
@@ -90,7 +89,7 @@ export class Router {
       this.staticRoutes.set(this.createStaticRouteMapKey(method, path), {
         method,
         path,
-        handler: handler as StaticHandler,
+        handler,
       });
     }
   }
